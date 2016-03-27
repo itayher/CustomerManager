@@ -23,8 +23,9 @@ define(['app'], function (app) {
             for (var i = 0; i < customers.length; i++) {
                 var cust = customers[i];
                 if (cust.firstName.toLowerCase().indexOf(filterValue) > -1 ||
-                    cust.lastName.toLowerCase().indexOf(filterValue) > -1 ||
-                    matchesProduct(cust, filterValue)) {
+                    cust.lastName.toLowerCase().indexOf(filterValue) > -1
+                    //matchesProduct(cust, filterValue)
+                ){
 
                     matches.push(cust);
                 }

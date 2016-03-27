@@ -2,37 +2,52 @@
 
 define(['app'], function (app) {
 
-    var injectParams = ['$http', '$q'];
+    var injectParams = ['$http', '$q', 'Backand'];
 
-    var customersFactory = function ($http, $q) {
-        var serviceBase = '/api/dataservice/',
+    var customersFactory = function ($http, $q, Backand) {
+        var serviceBase = Backand.getApiUrl() + '/1/objects/',
             factory = {};
 
         factory.getCustomers = function (pageIndex, pageSize) {
-            return getPagedResource('customers', pageIndex, pageSize);
+            return getPagedResource('customers?deep=true', pageIndex, pageSize);
         };
 
         factory.getCustomersSummary = function (pageIndex, pageSize) {
-            return getPagedResource('customersSummary', pageIndex, pageSize);
+            return getPagedResource('customers', pageIndex, pageSize);
         };
 
         factory.getStates = function () {
-            return $http.get(serviceBase + 'states').then(
+            return $http.get(serviceBase + 'states?pageSize=100').then(
                 function (results) {
-                    return results.data;
+                    return results.data.data;
                 });
         };
 
         factory.checkUniqueValue = function (id, property, value) {
             if (!id) id = 0;
-            return $http.get(serviceBase + 'checkUnique/' + id + '?property=' + property + '&value=' + escape(value)).then(
+            return $http ({
+              method: 'GET',
+              url: serviceBase + 'customers',
+              params: {
+                pageSize: 1,
+                pageNumber: 1,
+                filter: [
+                  {
+                    fieldName: property,
+                    operator: 'equals',
+                    value: escape(value)
+                  }
+                ],
+                sort: ''
+              }
+            }).then(
                 function (results) {
-                    return results.data.status;
+                    return (results.data.data.length == 0);
                 });
         };
 
         factory.insertCustomer = function (customer) {
-            return $http.post(serviceBase + 'postCustomer', customer).then(function (results) {
+            return $http.post(serviceBase + 'customers', customer).then(function (results) {
                 customer.id = results.data.id;
                 return results.data;
             });
@@ -43,24 +58,34 @@ define(['app'], function (app) {
         };
 
         factory.updateCustomer = function (customer) {
-            return $http.put(serviceBase + 'putCustomer/' + customer.id, customer).then(function (status) {
+            return $http.put(serviceBase + 'customers/' + customer.id, customer).then(function (status) {
                 return status.data;
             });
         };
 
         factory.deleteCustomer = function (id) {
-            return $http.delete(serviceBase + 'deleteCustomer/' + id).then(function (status) {
+            return $http.delete(serviceBase + 'customers/' + id).then(function (status) {
                 return status.data;
             });
         };
 
-        factory.getCustomer = function (id) {
+        factory.getCustomer = function (id, deep) {
             //then does not unwrap data so must go through .data property
             //success unwraps data automatically (no need to call .data property)
-            return $http.get(serviceBase + 'customerById/' + id).then(function (results) {
-                extendCustomers([results.data]);
-                return results.data;
-            });
+          return $http ({
+              method: 'GET',
+              url: serviceBase + 'customers/' + id + '?deep=' + String(deep),
+              params: {
+                pageSize: 100,
+                pageNumber: 1,
+                filter: null,
+                sort: ''
+              }
+          }).then(function (results) {
+              var cust = results.data;
+              extendCustomers([cust]);
+              return cust;
+          });
         };
 
         function extendCustomers(customers) {
@@ -80,22 +105,25 @@ define(['app'], function (app) {
         }
 
         function getPagedResource(baseResource, pageIndex, pageSize) {
-            var resource = baseResource;
-            resource += (arguments.length == 3) ? buildPagingUri(pageIndex, pageSize) : '';
-            return $http.get(serviceBase + resource).then(function (response) {
-                var custs = response.data;
-                extendCustomers(custs);
+            return $http ({
+                method: 'GET',
+                url: serviceBase + baseResource,
+                params: {
+                  pageSize: pageSize,
+                  pageNumber: pageIndex+1,
+                  filter: null,
+                  sort: ''
+                }
+            }).then(function(response){
+                var custs = response.data.data;
+                //extendCustomers(custs); //todo: need to replace with a query in the server
                 return {
-                    totalRecords: parseInt(response.headers('X-InlineCount')),
+                    totalRecords: response.data.totalRows,
                     results: custs
                 };
             });
         }
 
-        function buildPagingUri(pageIndex, pageSize) {
-            var uri = '?$top=' + pageSize + '&$skip=' + (pageIndex * pageSize);
-            return uri;
-        }
 
         // is this still used???
         function orderTotal(order) {

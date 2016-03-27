@@ -20,7 +20,7 @@ define(['app'], function (app) {
 
         vm.pageChanged = function (page) {
             vm.currentPage = page;
-            getCustomers();
+            getCustomers(vm.searchText);
         };
 
         vm.searchTextChanged = function () {
@@ -29,7 +29,7 @@ define(['app'], function (app) {
 
         function init() {
             //createWatches();
-            getCustomers();
+            getCustomers('');
         }
 
         //function createWatches() {
@@ -48,12 +48,12 @@ define(['app'], function (app) {
             vm.filteredCount = vm.filteredCustomers.length;
         }
 
-        function getCustomers() {
+        function getCustomers(filterText) {
             dataService.getCustomers(vm.currentPage - 1, vm.pageSize)
                 .then(function (data) {
                     vm.totalRecords = data.totalRecords;
                     vm.customers = data.results;
-                    filterCustomersProducts('');
+                    filterCustomersProducts(filterText);
                 }, function (error) {
                     $window.alert(error.message);
                 });

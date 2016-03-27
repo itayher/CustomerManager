@@ -27,7 +27,8 @@
                         <div class="form-group">
                             <label class="navbarText col-sm-2">Filter:</label>
                             <div class="col-sm-10">
-                                <input type="text"
+                                <input type="text",
+                                       ng-model-options="{ debounce: { 'default': 500, 'blur': 0 } }"
                                        data-ng-model="vm.searchText"
                                        data-ng-change="vm.searchTextChanged()"
                                        class="novalidate form-control" />
@@ -50,7 +51,7 @@
                                     <a href="#/customeredit/{{customer.id}}" class="white"><img data-ng-src="Content/images/{{customer.gender | lowercase}}.png" class="cardImage" /></a>
                                 </div>
                                 <div class="pull-left cardBodyRight">
-                                    <div class="cardBodyContent">{{customer.city}}, {{customer.state.name}}</div>
+                                    <div class="cardBodyContent">{{customer.city}}, {{customer.__metadata.descriptives.stateId.label}}</div>
                                     <div>
                                         <a href="#/customerorders/{{customer.id}}" class="btn-link">
                                             {{ customer.orderCount }}
@@ -106,7 +107,7 @@
                 </div>
             </div>
         </div>
-        <div class="row show-hide-animation" data-ng-show="vm.customers.length > 0">
+        <div class="row show-hide-animation" data-ng-show="vm.filteredCustomers.length > 0">
             <div class="col-md-12">
                 <div data-pagination
                      data-on-select-page="vm.pageChanged(page)"

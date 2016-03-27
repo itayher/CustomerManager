@@ -14,7 +14,7 @@ define(['app'], function (app) {
                 if (cust.firstName.toLowerCase().indexOf(filterValue) > -1 ||
                     cust.lastName.toLowerCase().indexOf(filterValue) > -1 ||
                     cust.city.toLowerCase().indexOf(filterValue) > -1 ||
-                    cust.state.name.toLowerCase().indexOf(filterValue) > -1) {
+                    String(cust.__metadata.descriptives.stateId.label).toLowerCase().indexOf(filterValue) > -1) {
 
                     matches.push(cust);
                 }

@@ -58,8 +58,9 @@ define(['app'], function (app) {
 
             getStates().then(function () {
                 if (customerId > 0) {
-                    dataService.getCustomer(customerId).then(function (customer) {
+                    dataService.getCustomer(customerId, false).then(function (customer) {
                         vm.customer = customer;
+                        vm.customer.stateId = Number(vm.customer.stateId);
                     }, processError);
                 } else {
                     dataService.newCustomer().then(function (customer) {

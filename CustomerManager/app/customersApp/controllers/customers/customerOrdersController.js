@@ -15,7 +15,7 @@ define(['app'], function (app) {
 
         function init() {
             if (customerId > 0) {
-                dataService.getCustomer(customerId)
+                dataService.getCustomer(customerId, true)
                 .then(function (customer) {
                     vm.customer = customer;
                     $scope.$broadcast('customer', customer);

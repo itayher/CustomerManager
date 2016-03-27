@@ -3,13 +3,13 @@
 define(['customersApp/services/routeResolver'], function () {
 
     var app = angular.module('customersApp', ['ngRoute', 'ngAnimate', 'routeResolverServices',
-                                              'wc.directives', 'wc.animations', 'ui.bootstrap', 'breeze.angular']);
+                                              'wc.directives', 'wc.animations', 'ui.bootstrap', 'breeze.angular', 'backand']);
 
     app.config(['$routeProvider', 'routeResolverProvider', '$controllerProvider',
-                '$compileProvider', '$filterProvider', '$provide', '$httpProvider',
+                '$compileProvider', '$filterProvider', '$provide', '$httpProvider','BackandProvider',
 
         function ($routeProvider, routeResolverProvider, $controllerProvider,
-                  $compileProvider, $filterProvider, $provide, $httpProvider) {
+                  $compileProvider, $filterProvider, $provide, $httpProvider, BackandProvider) {
 
             //Change default views and controllers directory using the following:
             //routeResolverProvider.routeConfig.setBaseDirectories('/app/views', '/app/controllers');
@@ -40,6 +40,10 @@ define(['customersApp/services/routeResolver'], function () {
                 .when('/about', route.resolve('About', '', 'vm'))
                 .when('/login/:redirect*?', route.resolve('Login', '', 'vm'))
                 .otherwise({ redirectTo: '/customers' });
+
+            BackandProvider.setAppName('customermanager');
+            BackandProvider.setSignUpToken('ef127546-b828-4c0e-824c-50c0d09f5998');
+            BackandProvider.setAnonymousToken('b4a43bc4-b24c-4edd-8497-dfbfce996ec2');
 
     }]);
 

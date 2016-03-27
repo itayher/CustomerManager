@@ -2,9 +2,9 @@
 
 define(['app'], function (app) {
 
-    var injectParams = ['$scope'];
+    var injectParams = ['$scope','dataService','$filter'];
 
-    var OrderChildController = function ($scope) {
+    var OrderChildController = function ($scope, dataService, $filter) {
         var vm = this;
 
         vm.orderby = 'product';
@@ -23,8 +23,13 @@ define(['app'], function (app) {
 
         function init() {
             if ($scope.customer) {
-                vm.customer = $scope.customer;
-                updateTotal($scope.customer);
+                dataService.getCustomer($scope.customer.id, true)
+                    .then(function (results) {
+                      vm.customer = results;
+                      updateTotal(vm.customer);
+                    }, function (error) {
+                      $window.alert(error.message);
+                    });
             }
             else {
                 $scope.$on('customer', function (event, customer) {

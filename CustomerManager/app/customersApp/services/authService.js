@@ -2,31 +2,30 @@
 
 define(['app'], function (app) {
 
-    var injectParams = ['$http', '$rootScope'];
+    var injectParams = ['$http', '$rootScope', 'Backand'];
 
-    var authFactory = function ($http, $rootScope) {
-        var serviceBase = '/api/dataservice/',
-            factory = {
+    var authFactory = function ($http, $rootScope, Backand) {
+        var factory = {
                 loginPath: '/login',
                 user: {
-                    isAuthenticated: false,
+                    isAuthenticated: (Backand.getToken() != ''),
                     roles: null
                 }
             };
 
         factory.login = function (email, password) {
-            return $http.post(serviceBase + 'login', { userLogin: { userName: email, password: password } }).then(
+            return Backand.signin(email, password).then(
                 function (results) {
-                    var loggedIn = results.data.status;;
+                    var loggedIn = (results.access_token != '');
                     changeAuth(loggedIn);
                     return loggedIn;
                 });
         };
 
         factory.logout = function () {
-            return $http.post(serviceBase + 'logout').then(
+            return Backand.signout().then(
                 function (results) {
-                    var loggedIn = !results.data.status;
+                    var loggedIn = !results;
                     changeAuth(loggedIn);
                     return loggedIn;
                 });

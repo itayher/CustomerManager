@@ -25,7 +25,7 @@ define(['app'], function (app) {
 
         vm.pageChanged = function (page) {
             vm.currentPage = page;
-            getCustomersSummary();
+            getCustomersSummary(vm.searchText);
         };
 
         vm.deleteCustomer = function (id) {
@@ -94,7 +94,7 @@ define(['app'], function (app) {
 
         function init() {
             //createWatches();
-            getCustomersSummary();
+            getCustomersSummary('');
         }
 
         //function createWatches() {
@@ -108,12 +108,12 @@ define(['app'], function (app) {
         //    });
         //}
 
-        function getCustomersSummary() {
+        function getCustomersSummary(filterText) {
             dataService.getCustomersSummary(vm.currentPage - 1, vm.pageSize)
             .then(function (data) {
                 vm.totalRecords = data.totalRecords;
                 vm.customers = data.results;
-                filterCustomers(''); //Trigger initial filter
+                filterCustomers(filterText); //Trigger initial filter
 
                 $timeout(function () {
                     vm.cardAnimationClass = ''; //Turn off animation since it won't keep up with filtering
